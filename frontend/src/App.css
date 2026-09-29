@@ -1,0 +1,337 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.login-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e8f5f9, #f5f9ff);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  position: relative;
+}
+
+.language-container {
+  position: absolute;
+  top: 25px;
+  right: 30px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.language-container label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.language-container select {
+  padding: 10px 14px;
+  border: 1px solid #cccccc;
+  border-radius: 8px;
+  background: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 500px;
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
+  text-align: center;
+}
+
+.logo-circle {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 15px;
+  border-radius: 50%;
+  background: #e8f5f9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 34px;
+}
+
+.login-card h1 {
+  margin: 5px 0;
+  font-size: 28px;
+}
+
+.welcome {
+  margin: 8px 0 25px;
+  color: #666;
+  font-size: 16px;
+}
+
+.login-card h2 {
+  margin-bottom: 25px;
+}
+
+.form-section {
+  margin-bottom: 22px;
+  text-align: left;
+}
+
+.form-section label {
+  display: block;
+  margin-bottom: 9px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.role-buttons,
+.method-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.role,
+.method {
+  flex: 1;
+  padding: 13px 8px;
+  border: 1px solid #d6d6d6;
+  border-radius: 10px;
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.role:hover,
+.method:hover {
+  border-color: #777;
+}
+
+.role.active,
+.method.active {
+  border: 2px solid #1976d2;
+  background: #eaf3ff;
+}
+
+input {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #cccccc;
+  border-radius: 10px;
+  font-size: 15px;
+  outline: none;
+}
+
+input:focus {
+  border-color: #1976d2;
+}
+
+.continue-button {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 10px;
+  background: #1976d2;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.continue-button:hover {
+  background: #125ca5;
+}
+
+@media (max-width: 600px) {
+  .login-page {
+    padding: 15px;
+  }
+
+  .login-card {
+    padding: 25px 20px;
+  }
+
+  .language-container {
+    top: 15px;
+    right: 15px;
+  }
+
+  .login-card h1 {
+    font-size: 22px;
+  }
+
+  .role-buttons,
+  .method-buttons {
+    flex-direction: column;
+  }
+}
+/* ============================= */
+/* OTP VERIFICATION PAGE */
+/* ============================= */
+
+.otp-page,
+.role-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  box-sizing: border-box;
+}
+
+.otp-card,
+.role-card {
+  width: 100%;
+  max-width: 450px;
+  padding: 35px;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+  text-align: center;
+}
+
+.otp-icon,
+.role-icon {
+  font-size: 50px;
+  margin-bottom: 15px;
+}
+
+.otp-card h1,
+.role-card h1 {
+  margin-bottom: 10px;
+}
+
+.otp-description {
+  color: #666;
+  line-height: 1.6;
+}
+
+.otp-identifier {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 20px 0;
+  padding: 15px;
+  background: #f5f7fa;
+  border-radius: 10px;
+}
+
+.demo-otp-box {
+  margin: 20px 0;
+  padding: 15px;
+  border-radius: 10px;
+  background: #fff8e1;
+  border: 1px solid #ffe082;
+}
+
+.demo-otp-box p {
+  margin: 6px 0;
+}
+
+.otp-input-container {
+  text-align: left;
+  margin-bottom: 15px;
+}
+
+.otp-input-container label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.otp-input-container input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 22px;
+  text-align: center;
+  letter-spacing: 8px;
+  outline: none;
+}
+
+.otp-input-container input:focus {
+  border-color: #2563eb;
+}
+
+.verify-button,
+.continue-button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: #2563eb;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.verify-button:hover,
+.continue-button:hover {
+  opacity: 0.9;
+}
+
+.resend-button,
+.back-button {
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.resend-button {
+  color: #2563eb;
+}
+
+.back-button {
+  color: #555;
+}
+
+.otp-error {
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.otp-success {
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #dcfce7;
+  color: #166534;
+}
+
+.user-information {
+  margin: 20px 0;
+  padding: 15px;
+  border-radius: 10px;
+  background: #f5f7fa;
+  text-align: left;
+}
+
+.user-information p {
+  margin: 8px 0;
+}
+
+@media (max-width: 600px) {
+  .otp-page,
+  .role-page {
+    padding: 15px;
+  }
+
+  .otp-card,
+  .role-card {
+    padding: 25px 20px;
+  }
+}

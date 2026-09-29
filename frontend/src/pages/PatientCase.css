@@ -1,0 +1,242 @@
+.case-page {
+  min-height: 100vh;
+  background: #f4f7fb;
+  padding: 30px;
+}
+
+.case-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.case-header {
+  background: white;
+  padding: 20px 25px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.case-header h1 {
+  margin: 0;
+}
+
+.case-header p {
+  margin: 5px 0 0;
+  color: #666;
+}
+
+.case-header button {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+
+  background: #2563eb;
+  color: white;
+
+  cursor: pointer;
+}
+
+.case-header button:hover {
+  background: #1d4ed8;
+}
+
+.case-card {
+  background: white;
+  padding: 35px;
+  border-radius: 14px;
+
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.case-title {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  margin-bottom: 25px;
+}
+
+.case-title h2 {
+  margin: 0 0 5px;
+}
+
+.case-title p {
+  margin: 0;
+  color: #666;
+}
+
+.case-icon {
+  width: 60px;
+  height: 60px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 50%;
+  background: #eef2ff;
+
+  font-size: 30px;
+}
+
+.case-info-box {
+  background: #eff6ff;
+
+  border-left: 4px solid #2563eb;
+
+  padding: 15px 18px;
+
+  margin-bottom: 25px;
+
+  border-radius: 6px;
+}
+
+.case-info-box strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.case-info-box p {
+  margin: 0;
+  color: #374151;
+}
+
+.case-error {
+  background: #fee2e2;
+  color: #991b1b;
+
+  padding: 12px 15px;
+
+  border-radius: 7px;
+
+  margin-bottom: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+
+  margin-bottom: 22px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 12px;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 7px;
+
+  font-size: 15px;
+
+  outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #2563eb;
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
+.form-group small {
+  color: #6b7280;
+}
+
+.case-actions {
+  display: flex;
+  justify-content: flex-end;
+
+  gap: 15px;
+
+  margin-top: 30px;
+}
+
+.case-cancel-button,
+.case-submit-button {
+  padding: 12px 22px;
+
+  border: none;
+  border-radius: 7px;
+
+  cursor: pointer;
+
+  font-size: 15px;
+}
+
+.case-cancel-button {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.case-cancel-button:hover {
+  background: #d1d5db;
+}
+
+.case-submit-button {
+  background: #2563eb;
+  color: white;
+}
+
+.case-submit-button:hover {
+  background: #1d4ed8;
+}
+
+.case-submit-button:disabled {
+  background: #93c5fd;
+  cursor: not-allowed;
+}
+
+@media (max-width: 650px) {
+
+  .case-page {
+    padding: 15px;
+  }
+
+  .case-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+
+  .case-header button {
+    width: 100%;
+  }
+
+  .case-card {
+    padding: 20px;
+  }
+
+  .case-title {
+    align-items: flex-start;
+  }
+
+  .case-actions {
+    flex-direction: column;
+  }
+
+  .case-cancel-button,
+  .case-submit-button {
+    width: 100%;
+  }
+}
