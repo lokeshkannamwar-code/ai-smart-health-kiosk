@@ -46,7 +46,7 @@ function PatientCases() {
   if (loading) return <main className="history-page"><p role="status">Loading your cases…</p></main>;
 
   return <main className="history-page"><div className="history-container">
-    <header className="history-header"><div><p className="eyebrow">PATIENT WORKSPACE</p><h1>{caseId ? "Case details" : "My health cases"}</h1>
+    <header className="history-header"><div><p className="eyebrow">Patient workspace</p><h1>{caseId ? "Case details" : "My health cases"}</h1>
       <p>{caseId ? "Review the information you shared with your care team." : "Your submitted and in-progress health cases."}</p></div>
       <button className="secondary-button" onClick={() => navigate("/patient-dashboard")}>Back to dashboard</button>
     </header>

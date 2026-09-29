@@ -61,7 +61,7 @@ function StaffDashboard() {
   if (!user && !error) return <main className="staff-page"><p role="status">Loading your workspace…</p></main>;
   const isAdmin = String(user?.role).toUpperCase() === "ADMIN";
 
-  return <div className="staff-page"><header className="staff-header"><div><p className="eyebrow">CARE TEAM WORKSPACE</p><h1>{isAdmin ? "System overview" : "Case review queue"}</h1></div>
+  return <div className="staff-page"><header className="staff-header"><div><p className="eyebrow">Care team workspace</p><h1>{isAdmin ? "System overview" : "Case review queue"}</h1></div>
     <button className="staff-signout" onClick={handleLogout}>Sign out</button></header>
     <main className="staff-content"><section className="staff-welcome"><div><h2>Hello, {user?.full_name || user?.fullName || (isAdmin ? "Administrator" : "Care team")}</h2>
       <p>{isAdmin ? "A read-only overview of kiosk accounts and case activity." : "Review completed patient intakes and record a care-team note."}</p></div></section>
@@ -69,7 +69,7 @@ function StaffDashboard() {
 
     {isAdmin && summary && <section className="admin-summary" aria-label="System counts">{[["Total users", summary.total_users], ["Active users", summary.active_users], ["Patients", summary.patients], ["Doctors", summary.doctors], ["Health cases", summary.total_cases], ["Awaiting review", summary.awaiting_review], ["Reviewed", summary.reviewed_cases]].map(([label, value]) => <article key={label}><span>{label}</span><strong>{value}</strong></article>)}</section>}
 
-    {!isAdmin && <section className="staff-queue"><div className="staff-section-heading"><div><p className="eyebrow">COMPLETED INTAKES</p><h2>Ready for review</h2></div><span>{cases.length} {cases.length === 1 ? "case" : "cases"}</span></div>
+    {!isAdmin && <section className="staff-queue"><div className="staff-section-heading"><div><p className="eyebrow">Completed patient cases</p><h2>Ready for review</h2></div><span>{cases.length} {cases.length === 1 ? "case" : "cases"}</span></div>
       {cases.length === 0 ? <div className="staff-empty"><h3>Queue is clear</h3><p>Completed patient intakes will appear here.</p></div> : cases.map((item) => <article className="review-card" key={item.id}>
         <div className="review-card-heading"><div><span className="staff-status">{item.case_status}</span><h3>{item.chief_complaint}</h3></div><time>{new Date(item.created_at).toLocaleString()}</time></div>
         <p className="patient-label">Patient: {item.patient_name}</p>

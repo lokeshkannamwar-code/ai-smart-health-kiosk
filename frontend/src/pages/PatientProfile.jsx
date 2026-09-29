@@ -27,7 +27,7 @@ function PatientProfile() {
 
   const fullName = user?.full_name || user?.fullName || "Patient";
   return <main className="profile-page"><div className="profile-container">
-    <header className="profile-header"><div><p className="eyebrow">PATIENT WORKSPACE</p><h1>My profile</h1><p>Account information associated with your sign-in.</p></div><button type="button" onClick={() => navigate("/patient-dashboard")}>Back to dashboard</button></header>
+    <header className="profile-header"><div><p className="eyebrow">Patient workspace</p><h1>My profile</h1><p>Account information associated with your sign-in.</p></div><button type="button" onClick={() => navigate("/patient-dashboard")}>Back to dashboard</button></header>
     <section className="profile-card"><div className="profile-avatar" aria-hidden="true">{fullName.slice(0,1).toUpperCase()}</div><h2>{fullName}</h2><p className="profile-role">{String(user?.role || "PATIENT").toLowerCase()}</p>
       <div className="profile-information">
         <div className="profile-row"><span>Full name</span><strong>{fullName}</strong></div>

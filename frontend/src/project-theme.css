@@ -1,0 +1,94 @@
+:root {
+  color: #29342d;
+  background: #f4f3ec;
+  font-family: "Segoe UI", Arial, sans-serif;
+  color-scheme: light;
+}
+
+body { color: #29342d; background: #f4f3ec; }
+
+h1, h2, h3, .login-card h1, .otp-card h1, .role-card h1, .interview-header h1, .interview-question h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 600;
+  letter-spacing: -.02em;
+}
+
+.eyebrow { color: #5d704f; font-size: 13px; font-weight: 600; letter-spacing: 0; }
+
+.login-page, .otp-page, .role-page, .interview-page,
+.patient-dashboard, .staff-page, .profile-page, .health-page, .history-page {
+  background: #f4f3ec;
+  color: #29342d;
+}
+
+.login-card, .otp-card, .role-card, .welcome-section, .dashboard-card, .recent-cases,
+.staff-welcome, .review-card, .staff-empty, .admin-summary article,
+.profile-header, .profile-card, .health-header, .health-card,
+.case-list-item, .case-detail, .history-empty, .interview-card {
+  border: 1px solid #dcded4;
+  border-radius: 7px;
+  box-shadow: none;
+}
+
+.login-card, .otp-card, .role-card, .welcome-section, .dashboard-card, .recent-cases,
+.review-card, .staff-empty, .admin-summary article, .profile-header, .profile-card,
+.health-header, .health-card, .case-list-item, .case-detail, .history-empty, .interview-card {
+  background: #fffefa;
+}
+
+.dashboard-card-primary, .staff-welcome { background: #eeefe5; }
+.dashboard-stats div, .case-facts div, .review-facts > div, .user-information { background: #f2f1e9; }
+
+.dashboard-header, .staff-header { background: #fffefa; border-color: #dcded4; }
+.dashboard-header h1, .staff-header h1 { font-family: Georgia, "Times New Roman", serif; font-size: 23px; }
+.dashboard-content, .staff-content { max-width: 1120px; }
+.welcome-section { border-left: 4px solid #657a54; }
+.dashboard-card { min-height: 230px; }
+.dashboard-card-icon { border: 1px solid #d4d8ca; border-radius: 4px; color: #526946; background: #f8f7f0; }
+.dashboard-card .eyebrow { margin-top: 17px; }
+.dashboard-card button, .dashboard-header button, .text-button,
+.profile-header button, .profile-card button, .health-header button,
+.secondary-button, .case-cancel-button {
+  border: 1px solid #c9cdbf;
+  border-radius: 4px;
+  color: #40503d;
+  background: #f2f1e9;
+}
+
+.dashboard-card button, .primary-button, .continue-button, .staff-signout, .review-button,
+.case-submit-button, .health-page .primary-button {
+  border-radius: 4px;
+  color: #fff;
+  background: #526946;
+}
+
+.dashboard-card button:hover, .primary-button:hover, .continue-button:hover,
+.staff-signout:hover, .review-button:hover, .case-submit-button:hover { background: #405638; }
+.dashboard-card button, .dashboard-header button, .text-button { padding: 9px 12px; }
+.dashboard-status, .status-pill, .staff-status { border-radius: 4px; letter-spacing: 0; color: #43583b; background: #e8ebdf; }
+
+.case-list-item:hover { border-color: #9ca58f; transform: none; }
+.case-detail section, .health-page .form-section { border-color: #e5e5dc; }
+.review-note { border-left: 3px solid #657a54; border-radius: 0; color: #39443b; background: #f1f1e8; }
+
+.login-card, .otp-card, .role-card { max-width: 480px; padding: 30px; text-align: left; }
+.login-card h1 { font-size: 29px; }
+.login-card .welcome { color: #60685e; }
+.logo-circle { width: 37px; height: 37px; border: 1px solid #809071; border-radius: 4px; color: #526946; background: #eef0e7; font-size: 22px; }
+.role, .method { border-radius: 4px; border-color: #cfd2c8; color: #465044; }
+.role.active, .method.active { border-color: #657a54; color: #354a30; background: #edf0e6; }
+.form-section input, .form-section textarea, .form-section select,
+.health-page .form-group input, .health-page .form-group select, .health-page .form-group textarea,
+.interview-card textarea, .review-card textarea {
+  border-radius: 4px;
+  border-color: #cfd2c8;
+  background: #fff;
+}
+.demo-otp-box { border-radius: 4px; border-color: #d2d7c9; background: #f1f2e9; }
+
+.error-message, .success-message { border-radius: 4px; }
+
+@media (max-width: 600px) {
+  .dashboard-content, .staff-content { padding: 22px 16px; }
+  .login-card, .otp-card, .role-card { padding: 23px 20px; }
+}

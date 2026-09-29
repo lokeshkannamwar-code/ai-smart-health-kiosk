@@ -71,7 +71,7 @@ function OTPVerification() {
     <main className="otp-page">
       <section className="otp-card" aria-labelledby="otp-title">
         <div className="otp-icon" aria-hidden="true">&#128272;</div>
-        <p className="eyebrow">SECURE SIGN IN</p>
+        <p className="eyebrow">Sign in</p>
         <h1 id="otp-title">Verify your account</h1>
         <p className="otp-description">Enter the 6-digit code for your {loginMethod === "mobile" ? "mobile number" : "email address"}.</p>
         <div className="otp-identifier"><strong>{identifier}</strong></div>

@@ -52,7 +52,7 @@ function PatientHealth() {
   if (loading) return <main className="health-page"><section className="health-card" role="status">Loading your health information…</section></main>;
 
   return <main className="health-page"><div className="health-container">
-    <header className="health-header"><div><p className="eyebrow">PATIENT WORKSPACE</p><h1>Health information</h1><p>Keep details that may help your care team up to date.</p></div>
+    <header className="health-header"><div><p className="eyebrow">Patient workspace</p><h1>Health information</h1><p>Keep details that may help your care team up to date.</p></div>
       <button type="button" onClick={() => navigate("/patient-dashboard")}>Back to dashboard</button></header>
     <section className="health-card"><div className="health-title"><div className="health-icon" aria-hidden="true">+</div><div><h2>My health record</h2><p>Only share information you are comfortable adding here.</p></div></div>
       {message && <div className="success-message" role="status">{message}</div>}{error && <div className="error-message" role="alert">{error}</div>}

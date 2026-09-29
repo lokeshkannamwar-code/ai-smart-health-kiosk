@@ -90,7 +90,7 @@ function AIQuestions() {
 
   if (completed) {
     return <main className="interview-page"><section className="interview-card interview-complete">
-      <div className="complete-mark" aria-hidden="true">✓</div><p className="eyebrow">CASE RECORDED</p>
+      <div className="complete-mark" aria-hidden="true">✓</div><p className="eyebrow">Case recorded</p>
       <h1>Thank you for sharing</h1><p>Your answers have been saved for your care team to review. This intake does not provide a diagnosis.</p>
       <div className="interview-actions"><button className="primary-button" onClick={() => navigate("/patient-cases/" + caseId)}>View case</button>
         <button className="secondary-button" onClick={() => navigate("/patient-dashboard")}>Back to dashboard</button></div>
@@ -99,7 +99,7 @@ function AIQuestions() {
 
   return <main className="interview-page"><section className="interview-card" aria-labelledby="interview-title">
     <header className="interview-header"><button type="button" className="text-button" onClick={() => navigate("/patient-dashboard")}>Back to dashboard</button>
-      <p className="eyebrow">GUIDED HEALTH INTAKE</p><h1 id="interview-title">A few more questions</h1>
+      <p className="eyebrow">Health questions</p><h1 id="interview-title">A few more questions</h1>
       <p>These follow-up questions help organize your case for review. They are not medical advice.</p>
     </header>
     <div className="interview-progress" role="progressbar" aria-label="Interview progress" aria-valuemin="0" aria-valuemax={questions.length} aria-valuenow={answers.length}>

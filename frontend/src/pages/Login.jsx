@@ -55,7 +55,7 @@ function Login() {
 
       <section className="login-card" aria-labelledby="login-title">
         <div className="logo-circle" aria-hidden="true">+</div>
-        <p className="eyebrow">PATIENT & CARE TEAM PORTAL</p>
+        <p className="eyebrow">Patient and care team portal</p>
         <h1>{text.appName}</h1>
         <p className="welcome">{text.welcome}</p>
         <h2 id="login-title">{text.login}</h2>
