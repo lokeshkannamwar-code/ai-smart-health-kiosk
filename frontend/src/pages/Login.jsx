@@ -1,11 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-import {
-  languages,
-  languageNames,
-  defaultLanguage
-} from "../i18n/i18n.js";
+import { languages, languageNames, defaultLanguage } from "../i18n/i18n.js";
+import { apiRequest } from "../services/api.js";
 
 function Login() {
   const navigate = useNavigate();
@@ -13,243 +9,100 @@ function Login() {
   const [role, setRole] = useState("");
   const [loginMethod, setLoginMethod] = useState("mobile");
   const [identifier, setIdentifier] = useState("");
-
-
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const text = languages[language];
 
- const handleContinue = async (event) => {
-  event.preventDefault();
+  const handleContinue = async (event) => {
+    event.preventDefault();
+    setError("");
+    if (!role) return setError(text.selectRole + ".");
 
-  if (!role) {
-    alert(text.selectRole);
-    return;
-  }
-
-  if (!identifier.trim()) {
-    alert(
-      loginMethod === "mobile"
-        ? text.enterMobile
-        : text.enterEmail
-    );
-    return;
-  }
-
-  try {
-    const response = await fetch(
-      "http://localhost:5000/api/auth/request-otp",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          identifier: identifier.trim()
-        })
-      }
-    );
-
-    const data = await response.json();
-
-    console.log("OTP Request Response:", data);
-
-    if (!response.ok) {
-      alert(
-        data.message ||
-        data.error ||
-        "Failed to request OTP."
-      );
-      return;
+    const cleanIdentifier = loginMethod === "mobile" ? identifier.trim().replace(/[\s()-]/g, "") : identifier.trim();
+    if (!cleanIdentifier) return setError(loginMethod === "mobile" ? text.enterMobile : text.enterEmail);
+    if (loginMethod === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanIdentifier)) {
+      return setError("Enter a valid email address.");
+    }
+    if (loginMethod === "mobile" && !/^\+?[0-9 ()-]{7,20}$/.test(cleanIdentifier)) {
+      return setError("Enter a valid mobile number, including the country code if needed.");
     }
 
-    navigate("/otp", {
-      state: {
-        role,
-        loginMethod,
-        identifier: identifier.trim(),
-        language,
-        developmentOtp: data.developmentOtp || ""
-      }
-    });
-
-  } catch (error) {
-    console.error("OTP request error:", error);
-
-    alert(
-      "Unable to connect to the backend server. Make sure the backend is running on port 5000."
-    );
-  }
-};
+    setLoading(true);
+    try {
+      const data = await apiRequest("auth/request-otp", {
+        method: "POST",
+        auth: false,
+        body: { identifier: cleanIdentifier },
+      });
+      navigate("/otp", {
+        state: { role, loginMethod, identifier: cleanIdentifier, language, developmentOtp: data.developmentOtp || "" },
+      });
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="login-page">
-
-      {/* LANGUAGE */}
+    <main className="login-page">
       <div className="language-container">
-        <label htmlFor="language">
-          Language
-        </label>
-
-        <select
-          id="language"
-          value={language}
-          onChange={(event) => setLanguage(event.target.value)}
-        >
-          {Object.entries(languageNames).map(
-            ([code, name]) => (
-              <option key={code} value={code}>
-                {name}
-              </option>
-            )
-          )}
+        <label htmlFor="language">Language</label>
+        <select id="language" value={language} onChange={(event) => setLanguage(event.target.value)}>
+          {Object.entries(languageNames).map(([code, name]) => <option key={code} value={code}>{name}</option>)}
         </select>
       </div>
 
-      {/* LOGIN CARD */}
-      <div className="login-card">
-
-        <div className="logo-circle">
-          🏥
-        </div>
-
+      <section className="login-card" aria-labelledby="login-title">
+        <div className="logo-circle" aria-hidden="true">+</div>
+        <p className="eyebrow">PATIENT & CARE TEAM PORTAL</p>
         <h1>{text.appName}</h1>
+        <p className="welcome">{text.welcome}</p>
+        <h2 id="login-title">{text.login}</h2>
 
-        <p className="welcome">
-          {text.welcome}
-        </p>
-
-        <h2>{text.login}</h2>
-
-        {/* ROLE */}
-        <div className="form-section">
-
-          <label>
-            {text.selectRole}
-          </label>
-
-          <div className="role-buttons">
-
-            <button
-              type="button"
-              className={
-                role === "patient"
-                  ? "role active"
-                  : "role"
-              }
-              onClick={() => setRole("patient")}
-            >
-              👤 {text.patient}
-            </button>
-
-            <button
-              type="button"
-              className={
-                role === "doctor"
-                  ? "role active"
-                  : "role"
-              }
-              onClick={() => setRole("doctor")}
-            >
-              👨‍⚕️ {text.doctor}
-            </button>
-
-            <button
-              type="button"
-              className={
-                role === "admin"
-                  ? "role active"
-                  : "role"
-              }
-              onClick={() => setRole("admin")}
-            >
-              🛡️ {text.admin}
-            </button>
-
-          </div>
-
-        </div>
-
-        {/* MOBILE / EMAIL */}
-        <div className="form-section">
-
-          <label>
-            {text.selectLoginMethod}
-          </label>
-
-          <div className="method-buttons">
-
-            <button
-              type="button"
-              className={
-                loginMethod === "mobile"
-                  ? "method active"
-                  : "method"
-              }
-              onClick={() => setLoginMethod("mobile")}
-            >
-              📱 {text.mobile}
-            </button>
-
-            <button
-              type="button"
-              className={
-                loginMethod === "email"
-                  ? "method active"
-                  : "method"
-              }
-              onClick={() => setLoginMethod("email")}
-            >
-              ✉️ {text.email}
-            </button>
-
-          </div>
-
-        </div>
-
-        {/* INPUT */}
         <form onSubmit={handleContinue}>
+          <div className="form-section">
+            <label>{text.selectRole}</label>
+            <div className="role-buttons">
+              {[["patient", text.patient], ["doctor", text.doctor], ["admin", text.admin]].map(([value, label]) => (
+                <button key={value} type="button" aria-pressed={role === value}
+                  className={role === value ? "role active" : "role"} onClick={() => setRole(value)}>
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
 
           <div className="form-section">
-
-            <label htmlFor="identifier">
-
-              {loginMethod === "mobile"
-                ? text.mobile
-                : text.email}
-
-            </label>
-
-            <input
-              id="identifier"
-              type={
-                loginMethod === "mobile"
-                  ? "tel"
-                  : "email"
-              }
-              value={identifier}
-              onChange={(event) =>
-                setIdentifier(event.target.value)
-              }
-              placeholder={
-                loginMethod === "mobile"
-                  ? text.enterMobile
-                  : text.enterEmail
-              }
-            />
-
+            <label>{text.selectLoginMethod}</label>
+            <div className="method-buttons">
+              {[["mobile", text.mobile], ["email", text.email]].map(([value, label]) => (
+                <button key={value} type="button" aria-pressed={loginMethod === value}
+                  className={loginMethod === value ? "method active" : "method"}
+                  onClick={() => { setLoginMethod(value); setIdentifier(""); setError(""); }}>
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <button
-            type="submit"
-            className="continue-button"
-          >
-            {text.continue}
+          <div className="form-section">
+            <label htmlFor="identifier">{loginMethod === "mobile" ? text.mobile : text.email}</label>
+            <input id="identifier" type={loginMethod === "mobile" ? "tel" : "email"}
+              autoComplete={loginMethod === "mobile" ? "tel" : "email"}
+              inputMode={loginMethod === "mobile" ? "tel" : "email"}
+              value={identifier} onChange={(event) => setIdentifier(event.target.value)}
+              placeholder={loginMethod === "mobile" ? text.enterMobile : text.enterEmail} required />
+          </div>
+
+          {error && <div className="error-message" role="alert">{error}</div>}
+          <button type="submit" className="continue-button" disabled={loading}>
+            {loading ? "Requesting code…" : text.continue}
           </button>
-
         </form>
-
-      </div>
-
-    </div>
+        <p className="login-footnote">Sign in with an account already registered by your care team.</p>
+      </section>
+    </main>
   );
 }
 

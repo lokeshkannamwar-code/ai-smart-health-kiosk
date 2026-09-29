@@ -5,56 +5,64 @@ const authRoutes = require("./routes/auth.routes");
 const patientAIRoutes = require("./routes/patient-ai.routes");
 const patientHealthRoutes = require("./routes/patient-health.routes");
 const patientCaseRoutes = require("./routes/patient-case.routes");
-
-const app = express();
-
-const PORT = 5000;
-
-app.use(cors());
-app.use(express.json());
-
-app.use("/api/auth", authRoutes);
-app.use("/api/patient-ai", patientAIRoutes);
-app.use("/api/patient/health", patientHealthRoutes);
-app.use("/api/patient/cases", patientCaseRoutes);
+const staffRoutes = require("./routes/staff.routes");
 const roleTestRoutes = require("./routes/role-test.routes");
 
-app.use("/api/test", roleTestRoutes);
+const app = express();
+const PORT = Number(process.env.PORT || 5000);
+
+app.use(cors({ origin: process.env.FRONTEND_ORIGIN || "http://localhost:5173" }));
+app.use(express.json({ limit: "1mb" }));
 
 app.get("/", (req, res) => {
-    res.json({
-        message: "AI Smart Health Kiosk Backend is running!"
-    });
+    res.json({ message: "AI Smart Health Kiosk API is running." });
 });
+
 app.get("/api/health", async (req, res) => {
     try {
-        const result = await pool.query(`
-            SELECT
-                current_database() AS database_name,
-                current_user AS database_user
-        `);
-
+        const result = await pool.query("SELECT current_database() AS database_name");
         res.json({
             success: true,
             server: "running",
             database: "connected",
             databaseName: result.rows[0].database_name,
-            databaseUser: result.rows[0].database_user,
-            project: "AI Smart Health Kiosk"
+            project: "AI Smart Health Kiosk",
         });
-
     } catch (error) {
         console.error("Database health check failed:", error.message);
-
-        res.status(500).json({
+        res.status(503).json({
             success: false,
             server: "running",
             database: "disconnected",
-            project: "AI Smart Health Kiosk"
+            message: "The API is running, but the database is unavailable.",
         });
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+app.use("/api/auth", authRoutes);
+app.use("/api/patient-ai", patientAIRoutes);
+app.use("/api/patient/health", patientHealthRoutes);
+app.use("/api/patient/cases", patientCaseRoutes);
+app.use("/api/staff", staffRoutes);
+app.use("/api/test", roleTestRoutes);
+
+app.use((error, req, res, next) => {
+    if (error instanceof SyntaxError && error.status === 400 && "body" in error) {
+        return res.status(400).json({ success: false, message: "Request body must be valid JSON." });
+    }
+    console.error("Unhandled API error:", error);
+    return res.status(500).json({ success: false, message: "An unexpected server error occurred." });
 });
+
+const server = app.listen(PORT, () => {
+    console.log("AI Smart Health Kiosk API listening on http://localhost:" + PORT);
+});
+
+function shutdown() {
+    server.close(() => {
+        pool.end().finally(() => process.exit(0));
+    });
+}
+
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);

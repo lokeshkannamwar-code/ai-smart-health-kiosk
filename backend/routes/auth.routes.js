@@ -196,6 +196,7 @@ router.post("/verify-otp", async (req, res) => {
 
     try {
         const identifier = normalizeIdentifier(req.body.identifier);
+        const requestedRole = String(req.body.role || "").trim().toUpperCase();
         const otp = String(req.body.otp || "").trim();
 
         if (!identifier || !otp) {
@@ -267,6 +268,11 @@ router.post("/verify-otp", async (req, res) => {
         }
 
         const user = userResult.rows[0];
+
+        if (requestedRole && requestedRole !== String(user.role).toUpperCase()) {
+            await client.query("ROLLBACK");
+            return res.status(403).json({ success: false, message: "This account is registered for the " + String(user.role).toLowerCase() + " role." });
+        }
 
         if (!user.is_active) {
             await client.query("ROLLBACK");

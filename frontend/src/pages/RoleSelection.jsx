@@ -1,94 +1,13 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import PatientDashboard from "../components/PatientDashboard.jsx";
+import { Navigate, useLocation } from "react-router-dom";
+
 function RoleSelection() {
-  const navigate = useNavigate();
   const location = useLocation();
-
   const data = location.state || {};
-
-  const {
-    role = "",
-    identifier = "",
-    loginMethod = "",
-    verified = false
-  } = data;
-
-  const handleContinue = () => {
-  if (!verified) {
-    navigate("/");
-    return;
-  }
-
-  if (role.toLowerCase() === "patient") {
-    navigate("/patient-dashboard", {
-      state: {
-        identifier,
-        loginMethod,
-        role
-      }
-    });
-    return;
-  }
-
-  alert(
-    `${role.charAt(0).toUpperCase() + role.slice(1)} dashboard will be created in the next phase.`
-  );
-};
-
-  return (
-    <div className="role-page">
-
-      <div className="role-card">
-
-        <div className="role-icon">
-          ✅
-        </div>
-
-        <h1>Verification Successful</h1>
-
-        <p>
-          Your OTP has been verified successfully.
-        </p>
-
-        <div className="user-information">
-
-          <p>
-            <strong>Role:</strong>{" "}
-            {role || "Not selected"}
-          </p>
-
-          <p>
-            <strong>Login Method:</strong>{" "}
-            {loginMethod || "Not selected"}
-          </p>
-
-          <p>
-            <strong>Account:</strong>{" "}
-            {identifier || "Not available"}
-          </p>
-
-        </div>
-
-        <button
-          type="button"
-          className="continue-button"
-          onClick={handleContinue}
-        >
-          Continue to Dashboard
-        </button>
-
-        <button
-          type="button"
-          className="back-button"
-          onClick={() => navigate("/")}
-        >
-          ← Back to Login
-        </button>
-
-      </div>
-
-    </div>
-  );
+  if (!data.verified || !data.user?.role) return <Navigate to="/" replace />;
+  const role = String(data.user.role).toUpperCase();
+  if (role === "PATIENT") return <Navigate to="/patient-dashboard" replace />;
+  if (role === "DOCTOR" || role === "ADMIN") return <Navigate to="/staff-dashboard" replace />;
+  return <Navigate to="/" replace />;
 }
 
 export default RoleSelection;

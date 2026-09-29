@@ -1,61 +1,39 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-
+import { Navigate, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login.jsx";
 import OTPVerification from "./pages/OTPVerification.jsx";
 import RoleSelection from "./pages/RoleSelection.jsx";
 import PatientDashboard from "./components/PatientDashboard.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import StaffDashboard from "./components/StaffDashboard.jsx";
 import PatientProfile from "./pages/PatientProfile.jsx";
 import PatientHealth from "./pages/PatientHealth.jsx";
 import PatientCase from "./pages/PatientCase.jsx";
-import AIQuestions from "./pages/AIQuestions";
+import PatientCases from "./pages/PatientCases.jsx";
+import AIQuestions from "./pages/AIQuestions.jsx";
 import "./App.css";
 
 function App() {
   return (
     <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/otp" element={<OTPVerification />} />
+      <Route path="/role" element={<RoleSelection />} />
 
-      {/* Login */}
-      <Route
-        path="/"
-        element={<Login />}
-      />
+      <Route element={<ProtectedRoute allowedRoles={["PATIENT"]} />}>
+        <Route path="/patient-dashboard" element={<PatientDashboard />} />
+        <Route path="/patient-profile" element={<PatientProfile />} />
+        <Route path="/patient-health" element={<PatientHealth />} />
+        <Route path="/patient-case" element={<PatientCase />} />
+        <Route path="/patient-cases" element={<PatientCases />} />
+        <Route path="/patient-cases/:caseId" element={<PatientCases />} />
+        <Route path="/ai-questions" element={<AIQuestions />} />
+      </Route>
 
-      {/* OTP Verification */}
-      <Route
-        path="/otp"
-        element={<OTPVerification />}
-      />
+      <Route element={<ProtectedRoute allowedRoles={["DOCTOR", "ADMIN"]} />}>
+        <Route path="/staff-dashboard" element={<StaffDashboard />} />
+      </Route>
 
-      {/* Role / Dashboard */}
-      <Route
-        path="/role"
-        element={<RoleSelection />}
-      />
-      <Route path="/ai-questions" element={<AIQuestions />} />
-      {/* Patient Dashboard */}
-<Route 
-  path="/patient-dashboard" 
-  element={<PatientDashboard />} 
-/>
-<Route
-  path="/patient-profile"
-  element={<PatientProfile />}
-/>
-<Route
-  path="/patient-health"
-  element={<PatientHealth />}
-/>
-<Route
-  path="/patient-case"
-  element={<PatientCase />}
-/>
-
-      {/* Unknown page */}
-      <Route
-        path="*"
-        element={<Navigate to="/" replace />}
-      />
-
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

@@ -1,212 +1,42 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { apiRequest } from "../services/api.js";
 import "./PatientProfile.css";
 
 function PatientProfile() {
   const navigate = useNavigate();
-
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const token = localStorage.getItem("sessionToken");
-
-        // Check authentication
-        if (!token) {
-          navigate("/");
-          return;
-        }
-
-        const response = await fetch(
-          "http://localhost:5000/api/auth/me",
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json"
-            }
-          }
-        );
-
-        const data = await response.json();
-
-        console.log("Patient Profile Response:", data);
-
-        if (!response.ok) {
-          localStorage.removeItem("sessionToken");
-          navigate("/");
-          return;
-        }
-
-        setUser(data.user);
-
-      } catch (error) {
-        console.error(
-          "Patient profile request failed:",
-          error
-        );
-
-        setError(
-          "Unable to connect to the backend server."
-        );
-
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserProfile();
+    let mounted = true;
+    apiRequest("auth/me")
+      .then((data) => { if (mounted) setUser(data.user); })
+      .catch((requestError) => {
+        if (!mounted) return;
+        if (requestError.status === 401) { localStorage.removeItem("sessionToken"); navigate("/"); return; }
+        setError(requestError.message);
+      })
+      .finally(() => { if (mounted) setLoading(false); });
+    return () => { mounted = false; };
   }, [navigate]);
 
-  // Loading screen
-  if (loading) {
-    return (
-      <div className="profile-page">
-        <div className="profile-card">
-          <h2>Loading Profile...</h2>
-          <p>
-            Retrieving your information securely.
-          </p>
-        </div>
+  if (loading) return <main className="profile-page"><section className="profile-card" role="status">Loading your profile…</section></main>;
+  if (error) return <main className="profile-page"><section className="profile-card"><h1>Unable to load profile</h1><p role="alert">{error}</p><button onClick={() => navigate("/patient-dashboard")}>Back to dashboard</button></section></main>;
+
+  const fullName = user?.full_name || user?.fullName || "Patient";
+  return <main className="profile-page"><div className="profile-container">
+    <header className="profile-header"><div><p className="eyebrow">PATIENT WORKSPACE</p><h1>My profile</h1><p>Account information associated with your sign-in.</p></div><button type="button" onClick={() => navigate("/patient-dashboard")}>Back to dashboard</button></header>
+    <section className="profile-card"><div className="profile-avatar" aria-hidden="true">{fullName.slice(0,1).toUpperCase()}</div><h2>{fullName}</h2><p className="profile-role">{String(user?.role || "PATIENT").toLowerCase()}</p>
+      <div className="profile-information">
+        <div className="profile-row"><span>Full name</span><strong>{fullName}</strong></div>
+        <div className="profile-row"><span>Mobile number</span><strong>{user?.mobile || "Not provided"}</strong></div>
+        <div className="profile-row"><span>Email address</span><strong>{user?.email || "Not provided"}</strong></div>
+        <div className="profile-row"><span>Account status</span><strong className="active-status">Active</strong></div>
       </div>
-    );
-  }
-
-  // Error screen
-  if (error) {
-    return (
-      <div className="profile-page">
-        <div className="profile-card">
-          <h2>Unable to Load Profile</h2>
-          <p>{error}</p>
-
-          <button
-            type="button"
-            onClick={() => navigate("/patient-dashboard")}
-          >
-            Back to Dashboard
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="profile-page">
-
-      <div className="profile-container">
-
-        {/* Header */}
-        <div className="profile-header">
-
-          <div>
-            <h1>My Profile</h1>
-            <p>AI Smart Health Kiosk</p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => navigate("/patient-dashboard")}
-          >
-            ← Dashboard
-          </button>
-
-        </div>
-
-
-        {/* Profile Card */}
-        <div className="profile-card">
-
-          <div className="profile-avatar">
-            👤
-          </div>
-
-          <h2>
-            {user?.full_name ||
-              user?.fullName ||
-              "Patient"}
-          </h2>
-
-          <p className="profile-role">
-            {user?.role || "PATIENT"}
-          </p>
-
-
-          {/* Information */}
-          <div className="profile-information">
-
-            <div className="profile-row">
-              <span>Full Name</span>
-
-              <strong>
-                {user?.full_name ||
-                  user?.fullName ||
-                  "Not available"}
-              </strong>
-            </div>
-
-
-            <div className="profile-row">
-              <span>Mobile Number</span>
-
-              <strong>
-                {user?.mobile ||
-                  "Not available"}
-              </strong>
-            </div>
-
-
-            <div className="profile-row">
-              <span>Email Address</span>
-
-              <strong>
-                {user?.email ||
-                  "Not available"}
-              </strong>
-            </div>
-
-
-            <div className="profile-row">
-              <span>Role</span>
-
-              <strong>
-                {user?.role ||
-                  "PATIENT"}
-              </strong>
-            </div>
-
-
-            <div className="profile-row">
-              <span>Account Status</span>
-
-              <strong className="active-status">
-                {user?.is_active === false
-                  ? "Inactive"
-                  : "Active"}
-              </strong>
-            </div>
-
-
-            <div className="profile-row">
-              <span>User ID</span>
-
-              <strong>
-                {user?.id ||
-                  "Not available"}
-              </strong>
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-  );
+    </section>
+  </div></main>;
 }
 
 export default PatientProfile;

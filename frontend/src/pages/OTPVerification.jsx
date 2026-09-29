@@ -1,295 +1,101 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { apiRequest } from "../services/api.js";
+import "./AIQuestions.css";
 
 function OTPVerification() {
   const navigate = useNavigate();
   const location = useLocation();
-
+  const loginData = location.state || {};
+  const { role = "", loginMethod = "mobile", identifier = "" } = loginData;
   const [otp, setOtp] = useState("");
+  const [developmentOtp, setDevelopmentOtp] = useState(loginData.developmentOtp || "");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Data received from Login page
-  const loginData = location.state || {};
+  if (!identifier) {
+    return (
+      <main className="otp-page"><section className="otp-card">
+        <h1>Sign-in details are missing</h1><p>Return to sign in and request a new code.</p>
+        <button className="back-button" onClick={() => navigate("/")}>Back to sign in</button>
+      </section></main>
+    );
+  }
 
-  const {
-    role = "patient",
-    loginMethod = "mobile",
-    identifier = "",
-    language = "en",
-    developmentOtp = ""
-  } = loginData;
-
-  // Handle OTP input
   const handleOtpChange = (event) => {
     const value = event.target.value;
-
-    // Allow only numbers and maximum 6 digits
-    if (/^\d*$/.test(value) && value.length <= 6) {
-      setOtp(value);
-      setError("");
-    }
+    if (/^\d*$/.test(value) && value.length <= 6) { setOtp(value); setError(""); }
   };
 
-  // Verify OTP with backend
   const handleVerify = async (event) => {
     event.preventDefault();
-
     setError("");
     setMessage("");
-
-    if (otp.length !== 6) {
-      setError("Please enter a 6-digit OTP.");
-      return;
-    }
-
-    if (!identifier) {
-      setError("Login information is missing. Please go back and login again.");
-      return;
-    }
-
+    if (otp.length !== 6) return setError("Enter the 6-digit code.");
+    setLoading(true);
     try {
-      setLoading(true);
-
-      const response = await fetch(
-        "http://localhost:5000/api/auth/verify-otp",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            identifier: identifier.trim(),
-            otp: otp
-          })
-        }
-      );
-
-      const data = await response.json();
-
-      console.log("OTP Verification Response:", data);
-
-      if (!response.ok) {
-        setError(
-          data.message ||
-          data.error ||
-          "OTP verification failed."
-        );
-        return;
+      const data = await apiRequest("auth/verify-otp", {
+        method: "POST", auth: false, body: { identifier: identifier.trim(), otp, role: role.toUpperCase() },
+      });
+      const token = data?.session?.token;
+      const actualRole = String(data?.user?.role || "").toLowerCase();
+      if (!token || !actualRole) throw new Error("The server did not return a complete sign-in session.");
+      if (role && role.toLowerCase() !== actualRole) {
+        return setError("This account is registered as " + actualRole + ". Go back and choose that role, then request a new code.");
       }
-
-      // Get session token from backend
-      const token =
-        data?.session?.token ||
-        data?.token ||
-        "";
-
-      if (!token) {
-        setError(
-          "OTP was verified, but no session token was received from the server."
-        );
-        return;
-      }
-
-      // Save authentication token
       localStorage.setItem("sessionToken", token);
-
-      setMessage("OTP verified successfully!");
-
-      // Go to role selection
-      setTimeout(() => {
-        navigate("/role", {
-          state: {
-            role,
-            loginMethod,
-            identifier,
-            language,
-            verified: true
-          }
-        });
-      }, 500);
-
-    } catch (error) {
-      console.error("OTP verification error:", error);
-
-      setError(
-        "Unable to connect to the backend server. Make sure the backend is running on port 5000."
-      );
+      setMessage("Code verified. Opening your workspace…");
+      navigate("/role", { replace: true, state: { role: actualRole, identifier, loginMethod, language, user: data.user, verified: true } });
+    } catch (verificationError) {
+      setError(verificationError.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Request OTP again
   const handleResend = async () => {
-    setOtp("");
-    setError("");
-    setMessage("");
-
-    if (!identifier) {
-      setError("Login information is missing.");
-      return;
-    }
-
+    setOtp(""); setError(""); setMessage(""); setLoading(true);
     try {
-      setLoading(true);
-
-      const response = await fetch(
-        "http://localhost:5000/api/auth/request-otp",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            identifier: identifier.trim()
-          })
-        }
-      );
-
-      const data = await response.json();
-
-      console.log("Resend OTP Response:", data);
-
-      if (!response.ok) {
-        setError(
-          data.message ||
-          data.error ||
-          "Failed to resend OTP."
-        );
-        return;
-      }
-
-      setMessage("A new OTP has been requested.");
-
-    } catch (error) {
-      console.error("Resend OTP error:", error);
-
-      setError(
-        "Unable to connect to the backend server."
-      );
+      const data = await apiRequest("auth/request-otp", { method: "POST", auth: false, body: { identifier: identifier.trim() } });
+      setDevelopmentOtp(data.developmentOtp || "");
+      setMessage("A new code was requested.");
+    } catch (resendError) {
+      setError(resendError.message);
     } finally {
       setLoading(false);
     }
-  };
-
-  // Go back to login
-  const handleBack = () => {
-    navigate("/");
   };
 
   return (
-    <div className="otp-page">
+    <main className="otp-page">
+      <section className="otp-card" aria-labelledby="otp-title">
+        <div className="otp-icon" aria-hidden="true">&#128272;</div>
+        <p className="eyebrow">SECURE SIGN IN</p>
+        <h1 id="otp-title">Verify your account</h1>
+        <p className="otp-description">Enter the 6-digit code for your {loginMethod === "mobile" ? "mobile number" : "email address"}.</p>
+        <div className="otp-identifier"><strong>{identifier}</strong></div>
 
-      <div className="otp-card">
-
-        <div className="otp-icon">
-          🔐
-        </div>
-
-        <h1>OTP Verification</h1>
-
-        <p>
-          Enter the 6-digit OTP sent to your{" "}
-          {loginMethod === "mobile"
-            ? "mobile number"
-            : "email address"}.
-        </p>
-
-        <div className="otp-account">
-          <strong>
-            {loginMethod === "mobile"
-              ? "Mobile:"
-              : "Email:"}
-          </strong>
-
-          <br />
-
-          {identifier}
-        </div>
-
-        {/* Development OTP */}
-        {developmentOtp && (
-          <div className="development-otp">
-            <strong>Development Mode</strong>
-
-            <p>
-              OTP generated by backend:
-            </p>
-
-            <strong>
-              {developmentOtp}
-            </strong>
-          </div>
-        )}
+        {developmentOtp && <div className="demo-otp-box" role="note">
+          <strong>Development code</strong><p>{developmentOtp}</p>
+          <small>Shown only in development mode. Production delivery must be configured separately.</small>
+        </div>}
 
         <form onSubmit={handleVerify}>
-
           <div className="form-section">
-
-            <label htmlFor="otp">
-              Enter OTP
-            </label>
-
-            <input
-              id="otp"
-              type="text"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              value={otp}
-              onChange={handleOtpChange}
-              placeholder="Enter 6-digit OTP"
-              maxLength={6}
-            />
-
+            <label htmlFor="otp">6-digit code</label>
+            <input id="otp" type="text" inputMode="numeric" autoComplete="one-time-code"
+              value={otp} onChange={handleOtpChange} placeholder="000000" maxLength={6} required />
           </div>
-
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
-
-          {message && (
-            <div className="success-message">
-              {message}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            className="continue-button"
-            disabled={loading}
-          >
-            {loading
-              ? "Verifying..."
-              : "Verify OTP"}
-          </button>
-
+          {error && <div className="error-message" role="alert">{error}</div>}
+          {message && <div className="success-message" role="status">{message}</div>}
+          <button type="submit" className="continue-button" disabled={loading}>{loading ? "Verifying…" : "Verify and continue"}</button>
         </form>
 
-        <button
-          type="button"
-          className="resend-button"
-          onClick={handleResend}
-          disabled={loading}
-        >
-          Resend OTP
-        </button>
-
-        <button
-          type="button"
-          className="back-button"
-          onClick={handleBack}
-          disabled={loading}
-        >
-          ← Back to Login
-        </button>
-
-      </div>
-
-    </div>
+        <button type="button" className="resend-button" onClick={handleResend} disabled={loading}>Request a new code</button>
+        <button type="button" className="back-button" onClick={() => navigate("/")} disabled={loading}>Back to sign in</button>
+      </section>
+    </main>
   );
 }
 
