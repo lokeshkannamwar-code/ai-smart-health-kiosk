@@ -1,48 +1,125 @@
 # AI Smart Health Kiosk
 
-A local full-stack kiosk prototype for patient sign-in, health records, guided case intake, and care-team review.
+**Presented by LAXMIPOOJA TECH COMPANY**
 
-## What works
+A multilingual health-kiosk prototype that helps patients share health information and gives care teams a clear way to review completed cases.
 
-- Role-aware OTP sign-in for registered patient, doctor, and administrator accounts.
-- Patient health profile and case history stored in PostgreSQL.
-- A guided follow-up interview that saves each answer and can be resumed.
-- A doctor review queue with optional notes, and a read-only administrator overview.
-- Session validation, logout, role-protected API endpoints, and a database health endpoint.
+> **Prototype scope:** The guided intake records patient-provided information. It does not diagnose conditions or recommend treatment. No external AI model or SMS/email OTP provider is configured.
 
-The guided intake organizes patient-provided information. It does not diagnose or recommend treatment. No external AI model or SMS/email delivery provider is configured in this repository.
+## Features
 
-## Requirements
+- Patient sign-in by mobile number or email, with role-aware OTP verification.
+- Patient profile, health information, guided case intake, follow-up questions, and case history.
+- Care-team queue with patient/case search, review-status filters, oldest/newest sorting, and review notes.
+- Read-only administrator overview of account and case counts.
+- App-wide language selection in English, Telugu, Hindi, Kannada, and Tamil. The selected language is remembered between pages.
+- Responsive layouts and a PostgreSQL-backed Express API.
 
-- Node.js 20.19+ or 22.12+ (required by Vite 8)
-- PostgreSQL 14+
+## Technology
 
-## First-time setup
+| Area | Stack |
+| --- | --- |
+| Frontend | React, Vite, React Router |
+| Backend | Node.js, Express |
+| Database | PostgreSQL |
 
-1. Create a PostgreSQL database, for example **ai_smart_health_kiosk**.
-2. Run **database/schema.sql** against that database.
-3. Copy **backend/.env.example** to **backend/.env** and enter your local PostgreSQL connection values. Do not commit **.env**.
-4. Install dependencies in the backend and frontend folders with **npm install**.
-5. In one terminal, start the backend from the backend folder with **npm run dev**.
-6. In another terminal, start the frontend from the frontend folder with **npm run dev**.
-7. Open the Vite address (normally http://localhost:5173).
+## Run locally
 
-To point the frontend at a different API address, add **VITE_API_URL=http://localhost:5000/api** to **frontend/.env.local** and restart Vite.
+### Requirements
 
-## Add local accounts
+- Node.js 22.12 or newer in the Node 22 line (or Node.js 20.19 or newer).
+- PostgreSQL 14 or newer.
 
-Sign-in is for existing accounts provisioned by the care team. Create a local test account with SQL such as:
+### 1. Create the database
 
-INSERT INTO users (full_name, email, role) VALUES ('Demo Patient', 'patient@example.test', 'PATIENT');
+Create a local database named `ai_smart_health_kiosk`, then run [`database/schema.sql`](database/schema.sql) against it. For example, from a shell with PostgreSQL command-line tools installed:
 
-Use role **DOCTOR** for a care-team account or **ADMIN** for an administrator account. In development mode, the OTP endpoint returns a short-lived code to the browser. OTP delivery is not connected to email or SMS. Before production, integrate a verified delivery provider, set **NODE_ENV=production**, and review the deployment security settings.
+```sh
+createdb ai_smart_health_kiosk
+psql -d ai_smart_health_kiosk -f database/schema.sql
+```
 
-## API health
+### 2. Configure the backend
 
-Open http://localhost:5000/api/health. A successful response reports both API and PostgreSQL status.
+```sh
+cp backend/.env.example backend/.env
+```
 
-## Project layout
+Edit `backend/.env` with your local PostgreSQL username and password. Keep `.env` files out of commits; the repository ignores them.
 
-- **frontend/** — React and Vite application
-- **backend/** — Express API and PostgreSQL access
-- **database/schema.sql** — initial database schema
+### 3. Install dependencies
+
+Run these commands from the repository root:
+
+```sh
+npm ci --prefix backend
+npm ci --prefix frontend
+```
+
+### 4. Start the app
+
+Open two terminals at the repository root.
+
+Terminal 1 — API:
+
+```sh
+cd backend
+npm run dev
+```
+
+Terminal 2 — web app:
+
+```sh
+cd frontend
+npm run dev
+```
+
+Open <http://localhost:5173>. The API health check is available at <http://localhost:5000/api/health>.
+
+The frontend defaults to `http://localhost:5000/api`. To use another API address, copy `frontend/.env.example` to `frontend/.env.local`, set `VITE_API_URL`, and restart Vite.
+
+## Local demo accounts
+
+Sign-in is available to accounts already in the database. Create synthetic local accounts with SQL such as:
+
+```sql
+INSERT INTO users (full_name, email, role)
+VALUES ('Demo Patient', 'demo-patient@example.test', 'PATIENT');
+
+INSERT INTO users (full_name, email, role)
+VALUES ('Demo Care Team', 'demo-care-team@example.test', 'DOCTOR');
+```
+
+Use `ADMIN` for an administrator account. In development mode, the OTP is shown in the app; email and SMS delivery are not configured. Do not use real patient accounts or health information for demos.
+
+## Quality checks
+
+Run the frontend checks from the repository root:
+
+```sh
+npm run lint --prefix frontend
+npm run build --prefix frontend
+```
+
+GitHub Actions runs these frontend checks and checks backend JavaScript syntax on pushes and pull requests to `main`.
+
+## Repository layout
+
+```text
+backend/             Express API and PostgreSQL access
+database/schema.sql  Database schema
+frontend/            React and Vite application
+.github/workflows/   GitHub Actions validation
+```
+
+## Upload this repository to GitHub
+
+1. Create an **empty** repository on GitHub. The local project already has its README and Git history, so do not initialize the GitHub repository with another README.
+2. From this project folder, add your repository as `origin` and push the `main` branch:
+
+```sh
+git remote add origin https://github.com/<YOUR-USERNAME>/<REPOSITORY-NAME>.git
+git push -u origin main
+```
+
+Before making a repository public, confirm that it contains no `.env` files, credentials, database backups, real patient details, or screenshots with personal health information. Choose a license before inviting others to reuse or contribute to the project.
