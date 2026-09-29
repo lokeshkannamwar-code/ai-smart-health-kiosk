@@ -7,7 +7,7 @@ function OTPVerification() {
   const navigate = useNavigate();
   const location = useLocation();
   const loginData = location.state || {};
-  const { role = "", loginMethod = "mobile", identifier = "" } = loginData;
+  const { role = "", loginMethod = "mobile", identifier = "", language = "en" } = loginData;
   const [otp, setOtp] = useState("");
   const [developmentOtp, setDevelopmentOtp] = useState(loginData.developmentOtp || "");
   const [error, setError] = useState("");
