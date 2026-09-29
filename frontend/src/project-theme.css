@@ -7,6 +7,31 @@
 
 body { color: #29342d; background: #f4f3ec; }
 
+.app-shell { min-height: 100vh; display: flex; flex-direction: column; }
+.app-header { position: relative; z-index: 2; color: #fff; background: linear-gradient(105deg, #594caa 0%, #368bb1 56%, #2a917b 100%); }
+.app-header-inner { width: min(1220px, calc(100% - 36px)); min-height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 18px; margin: 0 auto; }
+.app-brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.app-brand-mark { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid #ffffff91; border-radius: 5px; color: #fff; font-size: 23px; }
+.app-brand-copy { display: grid; gap: 2px; }
+.app-brand-copy strong { font-family: Georgia, "Times New Roman", serif; font-size: 15px; font-weight: 600; }
+.app-brand-copy small { color: #f2f3ff; font-size: 10px; }
+.app-brand-copy b { font-weight: 700; letter-spacing: .025em; }
+.app-language-picker { display: flex; align-items: center; gap: 8px; color: white; font-size: 12px; }
+.app-language-picker select { min-height: 34px; border: 1px solid #ffffff8f; border-radius: 4px; padding: 5px 28px 5px 9px; color: #2b3650; background: #fff; font: inherit; font-size: 12px; }
+.app-language-picker option { color: #29342d; }
+
+.login-page { background: linear-gradient(130deg, #fff0cf 0%, #f4dcf5 52%, #ddf4ff 100%); }
+.otp-page, .role-page { background: linear-gradient(130deg, #e0f3ff 0%, #eee7ff 52%, #fff0df 100%); }
+.case-page { background: linear-gradient(130deg, #def3ff 0%, #f5eaff 49%, #fff1d4 100%); }
+.patient-dashboard { background: linear-gradient(135deg, #e6f5ff 0%, #f0eaff 52%, #edf8dc 100%); }
+.health-page { background: linear-gradient(135deg, #ddf5ec 0%, #eaf4ff 52%, #fff2d8 100%); }
+.profile-page { background: linear-gradient(135deg, #ececff 0%, #def2ff 55%, #fce9f3 100%); }
+.history-page { background: linear-gradient(130deg, #fff0d7 0%, #f4e8ff 52%, #e0f3ff 100%); }
+.interview-page { background: linear-gradient(130deg, #e0f3ff 0%, #f0e8ff 54%, #fff0df 100%); }
+.staff-page { background: linear-gradient(130deg, #def5eb 0%, #e4efff 52%, #f4e9ff 100%); }
+
+.app-shell > .app-header + * { flex: 1; }
+
 h1, h2, h3, .login-card h1, .otp-card h1, .role-card h1, .interview-header h1, .interview-question h2 {
   font-family: Georgia, "Times New Roman", serif;
   font-weight: 600;
@@ -17,7 +42,6 @@ h1, h2, h3, .login-card h1, .otp-card h1, .role-card h1, .interview-header h1, .
 
 .login-page, .otp-page, .role-page, .interview-page,
 .patient-dashboard, .staff-page, .profile-page, .health-page, .history-page {
-  background: #f4f3ec;
   color: #29342d;
 }
 
@@ -91,4 +115,27 @@ h1, h2, h3, .login-card h1, .otp-card h1, .role-card h1, .interview-header h1, .
 @media (max-width: 600px) {
   .dashboard-content, .staff-content { padding: 22px 16px; }
   .login-card, .otp-card, .role-card { padding: 23px 20px; }
+  .app-header-inner { width: calc(100% - 24px); min-height: 58px; gap: 10px; }
+  .app-brand-copy small { max-width: 210px; font-size: 9px; }
+  .app-language-picker { gap: 5px; }
+  .app-language-picker select { max-width: 112px; }
 }
+
+@media (max-width: 390px) {
+  .app-brand-copy strong { font-size: 13px; }
+  .app-brand-copy small { max-width: 155px; line-height: 1.35; }
+  .app-language-picker > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
+  .app-language-picker select { max-width: 92px; padding-left: 6px; }
+}
+
+/* Give each part of the kiosk its own soft, multicolour canvas. */
+.login-page { background: linear-gradient(130deg, #fff0cf 0%, #f3ddf5 52%, #dff3ff 100%); }
+.otp-page, .role-page { background: linear-gradient(130deg, #def2ff 0%, #e8e5ff 52%, #fff0df 100%); }
+.case-page { background: linear-gradient(130deg, #d9f1ff 0%, #f0e1ff 48%, #fff0ca 100%); }
+.patient-dashboard { background: linear-gradient(135deg, #dff2ff 0%, #eee5ff 52%, #e6f6d8 100%); }
+.health-page { background: linear-gradient(135deg, #d9f5e9 0%, #dceeff 52%, #fff0d4 100%); }
+.profile-page { background: linear-gradient(135deg, #e8e5ff 0%, #d9efff 55%, #fce4f0 100%); }
+.history-page { background: linear-gradient(130deg, #fff0d2 0%, #f0e2ff 52%, #dcf1ff 100%); }
+.interview-page { background: linear-gradient(130deg, #dff3ff 0%, #efe4ff 54%, #fff0dc 100%); }
+.staff-page { background: linear-gradient(130deg, #dcf4e8 0%, #dcecff 52%, #f1e2ff 100%); }
+html, body, #root { min-width: 0; }

@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "../i18n/useLanguage.js";
+import { localeCodes } from "../i18n/i18n.js";
 import { apiRequest } from "../services/api.js";
 import "./StaffDashboard.css";
 
 function StaffDashboard() {
   const navigate = useNavigate();
+  const { language, t } = useLanguage();
   const [user, setUser] = useState(null);
   const [cases, setCases] = useState([]);
   const [summary, setSummary] = useState(null);
@@ -29,11 +32,8 @@ function StaffDashboard() {
   useEffect(() => {
     let mounted = true;
     const initialize = async () => {
-      try {
-        await loadData();
-      } catch (requestError) {
-        if (mounted) setError(requestError.message);
-      }
+      try { await loadData(); }
+      catch (requestError) { if (mounted) setError(requestError.message); }
     };
     initialize();
     return () => { mounted = false; };
@@ -42,9 +42,7 @@ function StaffDashboard() {
   const handleReview = async (caseId) => {
     setSavingId(caseId); setError(""); setMessage("");
     try {
-      await apiRequest("staff/cases/" + encodeURIComponent(caseId) + "/review", {
-        method: "POST", body: { review_notes: notes[caseId] || "" },
-      });
+      await apiRequest("staff/cases/" + encodeURIComponent(caseId) + "/review", { method: "POST", body: { review_notes: notes[caseId] || "" } });
       await loadData();
       setMessage("Review saved.");
     } catch (requestError) {
@@ -58,30 +56,33 @@ function StaffDashboard() {
     localStorage.removeItem("sessionToken"); navigate("/", { replace: true });
   };
 
-  if (!user && !error) return <main className="staff-page"><p role="status">Loading your workspace…</p></main>;
+  if (!user && !error) return <main className="staff-page"><p role="status">{t("Loading your workspace…")}</p></main>;
   const isAdmin = String(user?.role).toUpperCase() === "ADMIN";
+  const displayName = user?.full_name || user?.fullName || t(isAdmin ? "Administrator" : "Care team");
+  const locale = localeCodes[language] || "en-IN";
+  const dateTime = (value) => new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
 
-  return <div className="staff-page"><header className="staff-header"><div><p className="eyebrow">Care team workspace</p><h1>{isAdmin ? "System overview" : "Case review queue"}</h1></div>
-    <button className="staff-signout" onClick={handleLogout}>Sign out</button></header>
-    <main className="staff-content"><section className="staff-welcome"><div><h2>Hello, {user?.full_name || user?.fullName || (isAdmin ? "Administrator" : "Care team")}</h2>
-      <p>{isAdmin ? "A read-only overview of kiosk accounts and case activity." : "Review completed patient intakes and record a care-team note."}</p></div></section>
-    {error && <div className="error-message" role="alert">{error}</div>}{message && <div className="success-message" role="status">{message}</div>}
+  return <div className="staff-page"><header className="staff-header"><div><p className="eyebrow">{t("Care team workspace")}</p><h1>{t(isAdmin ? "System overview" : "Case review queue")}</h1></div>
+    <button className="staff-signout" onClick={handleLogout}>{t("Sign out")}</button></header>
+    <main className="staff-content"><section className="staff-welcome"><div><h2>{t("Hello, {name}", { name: displayName })}</h2>
+      <p>{t(isAdmin ? "A read-only overview of kiosk accounts and case activity." : "Review completed patient intakes and record a care-team note.")}</p></div></section>
+    {error && <div className="error-message" role="alert">{t(error)}</div>}{message && <div className="success-message" role="status">{t(message)}</div>}
 
-    {isAdmin && summary && <section className="admin-summary" aria-label="System counts">{[["Total users", summary.total_users], ["Active users", summary.active_users], ["Patients", summary.patients], ["Doctors", summary.doctors], ["Health cases", summary.total_cases], ["Awaiting review", summary.awaiting_review], ["Reviewed", summary.reviewed_cases]].map(([label, value]) => <article key={label}><span>{label}</span><strong>{value}</strong></article>)}</section>}
+    {isAdmin && summary && <section className="admin-summary" aria-label={t("System counts")}>{[["Total users", summary.total_users], ["Active users", summary.active_users], ["Patients", summary.patients], ["Doctors", summary.doctors], ["Health cases", summary.total_cases], ["Awaiting review", summary.awaiting_review], ["Reviewed cases", summary.reviewed_cases]].map(([label, value]) => <article key={label}><span>{t(label)}</span><strong>{value}</strong></article>)}</section>}
 
-    {!isAdmin && <section className="staff-queue"><div className="staff-section-heading"><div><p className="eyebrow">Completed patient cases</p><h2>Ready for review</h2></div><span>{cases.length} {cases.length === 1 ? "case" : "cases"}</span></div>
-      {cases.length === 0 ? <div className="staff-empty"><h3>Queue is clear</h3><p>Completed patient intakes will appear here.</p></div> : cases.map((item) => <article className="review-card" key={item.id}>
-        <div className="review-card-heading"><div><span className="staff-status">{item.case_status}</span><h3>{item.chief_complaint}</h3></div><time>{new Date(item.created_at).toLocaleString()}</time></div>
-        <p className="patient-label">Patient: {item.patient_name}</p>
-        <div className="review-facts"><div><span>Symptoms</span><p>{item.symptoms}</p></div><div><span>Duration · severity</span><p>{item.symptom_duration || "Not recorded"} · {item.symptom_severity || "Not recorded"}</p></div>
-          {item.additional_information && <div><span>Additional information</span><p>{item.additional_information}</p></div>}</div>
-        {item.intake_answers?.length > 0 && <div className="review-facts"><div><span>Guided intake answers</span>{item.intake_answers.map((answer, index) => <p key={index}><strong>Answer {answer.questionOrder}:</strong> {answer.answer}</p>)}</div></div>}
-        {item.reviewed_at && <p className="reviewed-at">Reviewed {new Date(item.reviewed_at).toLocaleString()}</p>}
-        <label htmlFor={"review-" + item.id}>Care-team note <span>(optional, up to 4,000 characters)</span></label>
-        <textarea id={"review-" + item.id} rows="3" maxLength={4000} value={notes[item.id] || ""} onChange={(event) => setNotes((current) => ({ ...current, [item.id]: event.target.value }))} placeholder="Record a note for the patient’s case history." />
-        <button className="review-button" disabled={savingId === item.id} onClick={() => handleReview(item.id)}>{savingId === item.id ? "Saving…" : item.reviewed_at ? "Update review" : "Save review"}</button>
+    {!isAdmin && <section className="staff-queue"><div className="staff-section-heading"><div><p className="eyebrow">{t("Completed patient cases")}</p><h2>{t("Ready for review")}</h2></div><span>{cases.length === 1 ? `1 ${t("case")}` : t("{count} cases", { count: cases.length })}</span></div>
+      {cases.length === 0 ? <div className="staff-empty"><h3>{t("Queue is clear")}</h3><p>{t("Completed patient intakes will appear here.")}</p></div> : cases.map((item) => <article className="review-card" key={item.id}>
+        <div className="review-card-heading"><div><span className="staff-status">{t(item.reviewed_at ? "Reviewed" : item.case_status === "COMPLETED" ? "Completed" : "Draft")}</span><h3>{item.chief_complaint}</h3></div><time>{dateTime(item.created_at)}</time></div>
+        <p className="patient-label">{t("Patient: {name}", { name: item.patient_name })}</p>
+        <div className="review-facts"><div><span>{t("Symptoms")}</span><p>{item.symptoms}</p></div><div><span>{t("Duration · severity")}</span><p>{item.symptom_duration || t("Not recorded")} · {t(item.symptom_severity || "Not recorded")}</p></div>
+          {item.additional_information && <div><span>{t("Additional information")}</span><p>{item.additional_information}</p></div>}</div>
+        {item.intake_answers?.length > 0 && <div className="review-facts"><div><span>{t("Guided intake answers")}</span>{item.intake_answers.map((answer, index) => <p key={index}><strong>{t("Answer {number}:", { number: answer.questionOrder })}</strong> {answer.answer}</p>)}</div></div>}
+        {item.reviewed_at && <p className="reviewed-at">{t("Reviewed {date}", { date: dateTime(item.reviewed_at) })}</p>}
+        <label htmlFor={"review-" + item.id}>{t("Care-team note")} <span>({t("optional, up to 4,000 characters")})</span></label>
+        <textarea id={"review-" + item.id} rows="3" maxLength={4000} value={notes[item.id] || ""} onChange={(event) => setNotes((current) => ({ ...current, [item.id]: event.target.value }))} placeholder={t("Record a note for the patient’s case history.")} />
+        <button className="review-button" disabled={savingId === item.id} onClick={() => handleReview(item.id)}>{savingId === item.id ? t("Saving…") : t(item.reviewed_at ? "Update review" : "Save review")}</button>
       </article>)}</section>}
-    <p className="staff-disclaimer">Case review is limited to authorized care-team accounts. The kiosk records patient-provided information and does not create diagnoses or treatment plans.</p>
+    <p className="staff-disclaimer">{t("Case review is limited to authorized care-team accounts. The kiosk records patient-provided information and does not create diagnoses or treatment plans.")}</p>
   </main></div>;
 }
 
